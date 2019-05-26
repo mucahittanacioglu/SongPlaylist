@@ -47,14 +47,46 @@ void readSongsFromFile(char* path);
 
 int main() {
     static char filename[] = "songs.txt";
+    int option=10;
+    char *nameForMenu,*durationForMenu;
+    char *inputSong;
+
     readSongsFromFile(filename);
-    deleteNode("poker face");
-    printAllPlaylists();
+
+    do{
+        printf("Enter your choice:\n"
+               "1 to insert a song into\n"
+               "2 to delete a song from\n"
+               "3 to print the songs in the list\n"
+               "4 to print the songs to an output file\n"
+               "5 to end.\n?");
+        scanf("%d",&option);
+        switch(option){
+            case 1:
+                printf("\nEnter a song name with duration:\n");
+
+                printf("%s",inputSong);
+                //nameForMenu=getOnlyName(inputSong);
+                //durationForMenu=getOnlyDuration(inputSong,strlen(getOnlyName(inputSong)));
+               // insertNode(nameForMenu,durationForMenu);
+                break;
+            case 2:
+                break;
+            case 3:
+                printAllPlaylists();
+                break;
+            case 4:
+                break;
+            default:
+                break;
+        }
+    }while(option!=5);
 
     return 0;
 }
 void readSongsFromFile(char* path){
     char *name;
+
     //int dur;
     FILE *filePtr = fopen ( path, "r" );
     if (filePtr != NULL){
