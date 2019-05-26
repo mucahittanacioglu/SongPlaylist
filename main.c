@@ -49,9 +49,10 @@ int main() {
     static char filename[] = "songs.txt";
     int option=10;
     char *nameForMenu,*durationForMenu;
-    char *inputSong;
+    char buffer[120];
 
     readSongsFromFile(filename);
+
 
     do{
         printf("Enter your choice:\n"
@@ -61,21 +62,30 @@ int main() {
                "4 to print the songs to an output file\n"
                "5 to end.\n?");
         scanf("%d",&option);
+        getchar();
         switch(option){
             case 1:
                 printf("\nEnter a song name with duration:\n");
-
-                printf("%s",inputSong);
-                //nameForMenu=getOnlyName(inputSong);
-                //durationForMenu=getOnlyDuration(inputSong,strlen(getOnlyName(inputSong)));
-               // insertNode(nameForMenu,durationForMenu);
+                fgets(buffer, sizeof buffer,stdin);
+                nameForMenu=getOnlyName(buffer);
+                insertNode(getOnlyName(buffer),getOnlyDuration(buffer,strlen(nameForMenu)));
+                memset(buffer,sizeof buffer,0);
                 break;
             case 2:
+                printf("\nEnter a song name :\n");
+                fgets(buffer, sizeof buffer,stdin);
+                nameForMenu=getOnlyName(buffer);
+                deleteNode(nameForMenu);
                 break;
             case 3:
                 printAllPlaylists();
                 break;
             case 4:
+                printf("Please enter output file name:\n");
+                char *outputfile;
+                scanf("%s", outputfile);
+                printf("%s",outputfile);
+
                 break;
             default:
                 break;
@@ -376,7 +386,7 @@ char* getOnlyName(char* input){
 
     name= malloc(sizeof(char)*(nameSize+1));
     name[nameSize]='\0';
-    for(int i = 0 ;i<nameSize;i++)
+    for(int i = 0 ;i<nameSize && (input[i]!='\n');i++)
         name[i]=input[i];
     return name;
 
