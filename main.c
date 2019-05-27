@@ -59,7 +59,7 @@ Song *random_root=NULL,*alpha_root=NULL,*duration_root=NULL,*chrone_root=NULL;
 int main() {
     static char filename[] = "songs.txt";
     int option=10;
-    char *nameForMenu;
+    char *nameForMenu,*outputfile,*inputfile;
     char buffer[120];
     readSongsFromFile(filename);
     shuffleRandomPlayList();
@@ -93,13 +93,12 @@ int main() {
                 break;
             case 4:
                 printf("Please enter output file name:\n");
-                char *outputfile;
                 scanf("%s", outputfile);
                 getchar();
                 writeThroughFile(outputfile);
-
                 break;
             default:
+                printf("Please select proper option..\n");
                 break;
         }
     }while(option!=5);
@@ -163,11 +162,11 @@ void writeThroughFile(char *outputfile) {//methdo automatically calls write to f
 }
 
 void printPlaylistsThroughFile(Song *root,char type,char *output){
-    int index=1;
-    FILE *cfPtr;
+    int index=1;//the order number on the lists
+    FILE *cfPtr;//file pointer
     switch(type) {
         case'D':
-            cfPtr= fopen(output,"w");
+            cfPtr= fopen(output,"w");//each function call if given output file same as before its remove everything inside first than appen for others
             index=1;
             fprintf(cfPtr,"The list in duration-time order:\n");
             while (root != NULL) {
@@ -178,7 +177,7 @@ void printPlaylistsThroughFile(Song *root,char type,char *output){
             fprintf(cfPtr,"\n");
             fclose(cfPtr);
             break;
-        case'A':
+        case'A'://appending list
             cfPtr= fopen(output,"a+");
             index=1;
             fprintf(cfPtr,"The list in alphabetical order:\n");
@@ -190,7 +189,7 @@ void printPlaylistsThroughFile(Song *root,char type,char *output){
             fprintf(cfPtr,"\n");
             fclose(cfPtr);
             break;
-        case'C':
+        case'C'://appending list
             cfPtr= fopen(output,"a+");
             index=1;
             fprintf(cfPtr,"The list in choronological order:\n");
@@ -202,8 +201,8 @@ void printPlaylistsThroughFile(Song *root,char type,char *output){
             fprintf(cfPtr,"\n");
             fclose(cfPtr);
             break;
-        case'R':
-            shuffleRandomPlayList();
+        case'R'://appending list
+            shuffleRandomPlayList();//shuffling before write
             cfPtr= fopen(output,"a+");
             index=1;
             fprintf(cfPtr,"The list in random order:\n");
@@ -222,24 +221,24 @@ void printPlaylistsThroughFile(Song *root,char type,char *output){
 }
 
 void readSongsFromFile(char* path){
-    char *name;
+    char *name;//name field for song on given file
 
     int dur;
     FILE *filePtr = fopen ( path, "r" );
     if (filePtr != NULL){
         char line [ 128 ];
         while ( fgets ( line, sizeof line, filePtr ) != NULL ){
-            name=getOnlyName(line);
-            dur=getOnlyDuration(line,strlen(name));
+            name=getOnlyName(line);//calls function which seperate name part from duration on given file and return it
+            dur=getOnlyDuration(line,strlen(name));// function that seperate duration part from file and return it
             insertNode(getOnlyName(line),dur);
         }
-        fclose ( filePtr );
+        fclose ( filePtr );//closing file
     }else{
-        perror ( path );
+        perror ( path );//if file couldnt find error message
     }
 }
 
-void deleteNode(char *name) {
+void deleteNode(char *name) {//delete given node from every list
     deleteFromChrone(name,&chrone_root);
     deleteFromAlphabetic(name,&alpha_root);
     deleteFromDuration(name,&duration_root);
@@ -261,7 +260,7 @@ void deleteFromRandom(char *name, Song **root) {
             printf("There is no song named as: %s\n\n",name);
         else{
             temp=iter->random_next;
-            iter->random_next=iter->random_next->random_next;
+            iter->random_next=iter->random_next->random_next;//deleting node and rearrange list
             free(temp);
         }
     }
@@ -282,7 +281,7 @@ void deleteFromDuration(char *name, Song **root) {
             printf("There is no song named as: %s\n\n",name);
         else{
             temp=iter->duration_next;
-            iter->duration_next=iter->duration_next->duration_next;
+            iter->duration_next=iter->duration_next->duration_next;//deleting node and rearrange list
             free(temp);
         }
     }
@@ -303,7 +302,7 @@ void deleteFromAlphabetic(char *name, Song **root) {
             printf("There is no song named as: %s\n\n",name);
         else{
             temp=iter->alpha_next;
-            iter->alpha_next=iter->alpha_next->alpha_next;
+            iter->alpha_next=iter->alpha_next->alpha_next;//deleting node and rearrange list
             free(temp);
         }
     }
@@ -324,7 +323,7 @@ void deleteFromChrone(char *name, Song **root) {
             printf("There is no song named as: %s\n\n",name);
         else{
             temp=iter->chrone_next;
-            iter->chrone_next=iter->chrone_next->chrone_next;
+            iter->chrone_next=iter->chrone_next->chrone_next;//deleting node and rearrange list
             free(temp);
         }
     }
@@ -333,7 +332,7 @@ void deleteFromChrone(char *name, Song **root) {
 void insertToRandom(Song song, Song **root) {
     Song *temp,*iter;
     iter=*root;
-    temp = (Song*)malloc(sizeof(Song));
+    temp = (Song*)malloc(sizeof(Song));//creating song(node) to insert
     strcpy((temp)->name,song.name);
     temp->duration=song.duration;
 
@@ -344,7 +343,7 @@ void insertToRandom(Song song, Song **root) {
     }else{
         while(iter->random_next !=NULL )
             iter=iter->random_next;//Finding end of list.
-        temp->random_next=NULL;
+        temp->random_next=NULL;//rearrange list
         iter->random_next=temp;
 
     }
@@ -354,7 +353,7 @@ void insertToChrone(Song song, Song **root) {
     Song *temp,*iter;
     iter=*root;
     temp = (Song*)malloc(sizeof(Song));
-    strcpy((temp)->name,song.name);
+    strcpy((temp)->name,song.name);//creating song(node) to insert
     temp->duration=song.duration;
 
     if(*root==NULL){
@@ -364,7 +363,7 @@ void insertToChrone(Song song, Song **root) {
     }else{
         while(iter->chrone_next !=NULL )
             iter=iter->chrone_next;//Finding end of list.
-        temp->chrone_next=NULL;
+        temp->chrone_next=NULL;//rearrange list
         iter->chrone_next=temp;
 
     }
@@ -374,7 +373,7 @@ void insertToAlphabetic(Song song, Song **root) {
     Song *temp,*iter;
     iter=*root;
     temp = (Song*)malloc(sizeof(Song));
-    strcpy((temp)->name,song.name);
+    strcpy((temp)->name,song.name);//creating song(node) to insert
     temp->duration=song.duration;
 
     if(*root==NULL){
@@ -392,7 +391,7 @@ void insertToAlphabetic(Song song, Song **root) {
             temp->alpha_next=NULL;
             iter->alpha_next=temp;
         }else{
-            temp->alpha_next = iter->alpha_next;
+            temp->alpha_next = iter->alpha_next;//rearrange list
             iter->alpha_next = temp;
         }
     }
@@ -402,7 +401,7 @@ void insertToDuration(Song song, Song **root) {
     Song *temp,*iter;
     iter=*root;
     temp = (Song*)malloc(sizeof(Song));
-    strcpy((temp)->name,song.name);
+    strcpy((temp)->name,song.name);//creating song(node) to insert
     temp->duration=song.duration;
 
     if(*root==NULL){
@@ -424,14 +423,14 @@ void insertToDuration(Song song, Song **root) {
             return;
         }
         //Here if songs going to add between 2 song
-        temp->duration_next=iter->duration_next;
+        temp->duration_next=iter->duration_next;//rearrange list
         iter->duration_next=temp;
     }
 
 
 }
 
-char* getDurasMinSec(int a){
+char* getDurasMinSec(int a){//this method simply take integer as time and return it format of mm:ss as char array length of 5
     char* duration= malloc(sizeof(char)*6);
     duration[5]='\0';
     duration[2]=':';
@@ -447,25 +446,26 @@ void insertNodeWithRoots(char * name, int duration, Song **alpha_root, Song **du
     //Creating new node to insert list.
     Song temp={'\0'};
     strcpy(temp.name,name);
-    temp.duration=duration;
+    temp.duration=duration;//creating song(node) to insert
+
     insertToRandom(temp,random_root);
-    insertToChrone(temp,chrone_root);
+    insertToChrone(temp,chrone_root);//calling insert function for all nodes
     insertToAlphabetic(temp,alpha_root);
     insertToDuration(temp,duration_root);
 }
 
-void insertNode(char *name,int duration){
+void insertNode(char *name,int duration){//this method simply call original insert function to make easy use for user
     insertNodeWithRoots(name,duration,&alpha_root,&duration_root,&chrone_root,&random_root);
 }
 
-void printPlaylistsWithType(Song *root,char type){
+void printPlaylistsWithType(Song *root,char type){//this method prints all lists base on given type there is printAllList()f function which calls this method for all lists.
     int index=1;
     switch(type) {
         case'D':
             index=1;
             printf("The list in duration-time order:\n");
             while (root != NULL) {
-                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));
+                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));//Printing Duration based list.
                 root = root->duration_next;
                 index++;
             }
@@ -475,7 +475,7 @@ void printPlaylistsWithType(Song *root,char type){
             index=1;
             printf("The list in alphabetical order:\n");
             while (root != NULL) {
-                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));
+                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));//Printing Alphabetic order based list.
                 root = root->alpha_next;
                 index++;
             }
@@ -485,18 +485,18 @@ void printPlaylistsWithType(Song *root,char type){
             index=1;
             printf("The list in choronological order:\n");
             while (root != NULL) {
-                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));
+                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));//Printing choronological based list.
                 root = root->chrone_next;
                 index++;
             }
             printf("\n");
             break;
         case'R':
-            shuffleRandomPlayList();
+            shuffleRandomPlayList();//shuffling random list before print
             index=1;
             printf("The list in random order:\n");
             while (root != NULL) {
-                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));
+                printf("\t%d. %s\t%s\n",index,root->name,getDurasMinSec(root->duration));//Printing random order based list.
                 root = root->random_next;
                 index++;
             }
@@ -508,7 +508,7 @@ void printPlaylistsWithType(Song *root,char type){
     }
 }
 
-void printAllPlaylists() {
+void printAllPlaylists() {//print function which calls original one for all lists
     printPlaylistsWithType(chrone_root,'C');
     printPlaylistsWithType(alpha_root,'A');
     printPlaylistsWithType(duration_root,'D');
@@ -518,7 +518,7 @@ void printAllPlaylists() {
 char* getOnlyName(char* input) {
     char *name;
     int nameSize;
-    for (nameSize = 0; nameSize < 60; nameSize++) {
+    for (nameSize = 0; nameSize < 60; nameSize++) {//here  we seperate given input whether name and duration seperated with \t or two ' ' or one ' ' character and base onthis stores total lenght of given song name
         if ((input[nameSize] ==' ' && input[nameSize + 1] ==' '))
             break;
         else if(input[nameSize]==' ' && ((input[nameSize + 1] - '0') <= 9 && (input[nameSize + 1] - '0') >= 0))
@@ -526,30 +526,30 @@ char* getOnlyName(char* input) {
         else if((input[nameSize] == '\t') || (input[nameSize] == '\n') )
             break;
     }
-    name= malloc(sizeof(char)*(nameSize+2));
+    name= malloc(sizeof(char)*(nameSize+2));//creating new char array to store name of song
     memset(name,0,nameSize+2);
     name[nameSize+1]='\0';
-    for(int i = 0 ;i<nameSize ;i++)
+    for(int i = 0 ;i<nameSize ;i++)//copying name of song o only name array
         name[i]=input[i];
 
     return name;
 
 }
 
-int stringToInt(char* duration){
+int stringToInt(char* duration){//this function simply calculate total second value of given time as format of mm:ss
     int k = (((duration[0]-'0')*10)+(duration[1]-'0'))*60+(((duration[3]-'0')*10)+duration[4]-'0');
     return k;
 }
 
-int getOnlyDuration(char* input,int nameSize){
+int getOnlyDuration(char* input,int nameSize){//this method seperates duration part of given input with using name lenght of song which we calculate before in getOnlyName() function.
     char* duration=malloc(sizeof(char)*6);
-    duration[5]='\0';
+    duration[5]='\0';//here we create duration chararray which will store duration of song as formta of mm:ss
     int iter=0;
-    for(int i = nameSize;i <= strlen(input)-1;i++)
+    for(int i = nameSize;i <= strlen(input)-1;i++)//we seperate song's duration part.
         if( input[i]!=' ' && input[i]!='\t') {
             duration[iter] = input[i];
             iter++;
         }
-    return stringToInt(duration);
+    return stringToInt(duration);//and we send this duration as format of mm:ss to stringToInt() functin which calculates time string as  second with integer datatype.
 }
 
