@@ -54,22 +54,25 @@ void shuffleRandomPlayList();
 
 int isIn(int*,int,int);
 
+void insertNewSongsFromFile();
+
 Song *random_root=NULL,*alpha_root=NULL,*duration_root=NULL,*chrone_root=NULL;
 
 int main() {
     static char filename[] = "songs.txt";
     int option=10;
-    char *nameForMenu,*outputfile,*inputfile;
-    char buffer[120];
+    char *nameForMenu,*outputfile;
+    char buffer[120]={'\0'},buffer2[50]={'\0'};
     readSongsFromFile(filename);
     shuffleRandomPlayList();
        do{
-        printf("Enter your choice:\n"
+        printf("\nEnter your choice:\n"
                "1 to insert a song into\n"
                "2 to delete a song from\n"
                "3 to print the songs in the list\n"
                "4 to print the songs to an output file\n"
-               "5 to end.\n?");
+               "5 to insert songs from a file\n"
+               "6 to end.\n?");
         scanf("%d",&option);
         getchar();
         switch(option){
@@ -96,14 +99,22 @@ int main() {
                 scanf("%s", outputfile);
                 getchar();
                 writeThroughFile(outputfile);
+                printf("The songs in list exported to  \"%s\"..\n",outputfile);
+                break;
+            case 5:
+                printf("Please enter input file name:\n");
+                fgets(buffer2,50,stdin);//reading line max 50 character
+                readSongsFromFile(getOnlyName(buffer2));//reading songs from given file
+                printf("The songs in \"%s\" imported to list..\n",getOnlyName(buffer2));
                 break;
             default:
-                printf("Please select proper option..\n");
+                printf("Please select proper option!\n");
                 break;
         }
-    }while(option!=5);
+    }while(option!=6);
     return 0;
 }
+
 
 void shuffleRandomPlayList(){
     //Getting list size create an integer array to store random indises later;
@@ -226,13 +237,14 @@ void readSongsFromFile(char* path){
     int dur;
     FILE *filePtr = fopen ( path, "r" );
     if (filePtr != NULL){
-        char line [ 128 ];
-        while ( fgets ( line, sizeof line, filePtr ) != NULL ){
+        char line [ 128 ];//creating buffer to store our lines
+        while ( fgets ( line, sizeof line, filePtr ) != NULL ){//reading max 128 char from each line and store it in buffer which is line char array
             name=getOnlyName(line);//calls function which seperate name part from duration on given file and return it
             dur=getOnlyDuration(line,strlen(name));// function that seperate duration part from file and return it
-            insertNode(getOnlyName(line),dur);
+            insertNode(getOnlyName(line),dur);//inserting function base on given song properties.
         }
         fclose ( filePtr );//closing file
+        free(filePtr);
     }else{
         perror ( path );//if file couldnt find error message
     }
