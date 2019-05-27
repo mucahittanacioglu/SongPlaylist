@@ -107,6 +107,9 @@ int main() {
                 readSongsFromFile(getOnlyName(buffer2));//reading songs from given file
                 printf("The songs in \"%s\" imported to list..\n",getOnlyName(buffer2));
                 break;
+            case 6:
+                printf("\nExiting program....");
+                break;
             default:
                 printf("Please select proper option!\n");
                 break;
@@ -446,8 +449,8 @@ char* getDurasMinSec(int a){//this method simply take integer as time and return
     char* duration= malloc(sizeof(char)*6);
     duration[5]='\0';
     duration[2]=':';
-    duration[0]='0';
-    duration[1]='0'+(a/60);
+    duration[0]='0'+(a/60)/10;
+    duration[1]='0'+(a/60)%10;
     duration[3]='0'+(a%60)/10;
     duration[4]='0'+(a%60)%10;
     return duration;
